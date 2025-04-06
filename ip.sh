@@ -1996,6 +1996,24 @@ fi
 ;;
 y)mode_yes=1
 ;;
+p)
+IP="$OPTARG"
+# Validate the provided IP address
+if is_valid_ipv4 "$IP"; then
+    IPV4="$IP"
+    IPV4work=1
+    IPV4check=1
+    IPV6check=0
+elif is_valid_ipv6 "$IP"; then
+    IPV6="$IP"
+    IPV6work=1
+    IPV6check=1
+    IPV4check=0
+else
+    echo -ne "\r$Font_B$Font_Red Invalid IP address: $IP $Font_Suffix\n"
+    exit 1
+fi
+;;
 \?)ERRORcode=1
 esac
 done
