@@ -1580,79 +1580,79 @@ chatgpt[utype]="${smedia[nodata]}"
 return
 fi
 }
-check_local_port_25(){
-local host=$1
-local port=$2
-nc -s "$IP" -z -w5 $host $port >/dev/null 2>&1
-if [ $? -eq 0 ]&&[ -z "$usePROXY" ];then
-smail[local]=1
-else
-smail[local]=0
-fi
-}
+# check_local_port_25(){
+# local host=$1
+# local port=$2
+# nc -s "$IP" -z -w5 $host $port >/dev/null 2>&1
+# if [ $? -eq 0 ]&&[ -z "$usePROXY" ];then
+# smail[local]=1
+# else
+# smail[local]=0
+# fi
+# }
 get_sorted_mx_records(){
 local domain=$1
 dig +short MX $domain|sort -n|head -1|awk '{print $2}'
 }
-check_email_service(){
-local service=$1
-local port=25
-local expected_response="220"
-local domain=""
-local host=""
-local response=""
-local success="false"
-case $service in
-"Gmail")domain="gmail.com";;
-"Outlook")domain="outlook.com";;
-"Yahoo")domain="yahoo.com";;
-"Apple")domain="me.com";;
-"QQ")domain="qq.com";;
-"MailRU")domain="mail.ru";;
-"AOL")domain="aol.com";;
-"GMX")domain="gmx.com";;
-"MailCOM")domain="mail.com";;
-"163")domain="163.com";;
-"Sohu")domain="sohu.com";;
-"Sina")domain="sina.com";;
-*)return
-esac
-if [[ -z $host ]];then
-local mx_hosts=($(get_sorted_mx_records $domain))
-for host in "${mx_hosts[@]}";do
-response=$(timeout 4 bash -c "echo -e 'QUIT\r\n' | nc -s $IP -w4 $host $port 2>&1")
-smail_response[$service]=$response
-if [[ $response == *"$expected_response"* ]];then
-success="true"
-smail[$service]="$Back_Green$Font_White$Font_B$service$Font_Suffix"
-break
-fi
-done
-else
-response=$(timeout 4 bash -c "echo -e 'QUIT\r\n' | nc -s $IP -w4 $host $port 2>&1")
-if [[ $response == *"$expected_response"* ]];then
-success="true"
-smail[$service]="$Back_Green$Font_White$Font_B$service$Font_Suffix"
-fi
-fi
-if [[ $success == "false" ]];then
-smail[$service]="$Back_Red$Font_White$Font_B$service$Font_Suffix"
-fi
-}
-check_mail(){
-check_local_port_25 "localhost" 25
-if [ ${smail[local]} -eq 1 ];then
-services=("Gmail" "Outlook" "Yahoo" "Apple" "QQ" "MailRU" "AOL" "GMX" "MailCOM" "163" "Sohu" "Sina")
-for service in "${services[@]}";do
-local temp_info="$Font_Cyan$Font_B${sinfo[mail]}$Font_I$service $Font_Suffix"
-((ibar_step+=3))
-show_progress_bar "$temp_info" $((40-1-${#service}-${sinfo[lmail]}))&
-bar_pid="$!"&&disown "$bar_pid"
-check_email_service $service
-kill_progress_bar
-done
-fi
-}
+# check_email_service(){
+# local service=$1
+# local port=25
+# local expected_response="220"
+# local domain=""
+# local host=""
+# local response=""
+# local success="false"
+# case $service in
+# "Gmail")domain="gmail.com";;
+# "Outlook")domain="outlook.com";;
+# "Yahoo")domain="yahoo.com";;
+# "Apple")domain="me.com";;
+# "QQ")domain="qq.com";;
+# "MailRU")domain="mail.ru";;
+# "AOL")domain="aol.com";;
+# "GMX")domain="gmx.com";;
+# "MailCOM")domain="mail.com";;
+# "163")domain="163.com";;
+# "Sohu")domain="sohu.com";;
+# "Sina")domain="sina.com";;
+# *)return
+# esac
+# if [[ -z $host ]];then
+# local mx_hosts=($(get_sorted_mx_records $domain))
+# for host in "${mx_hosts[@]}";do
+# response=$(timeout 4 bash -c "echo -e 'QUIT\r\n' | nc -s $IP -w4 $host $port 2>&1")
+# smail_response[$service]=$response
+# if [[ $response == *"$expected_response"* ]];then
+# success="true"
+# smail[$service]="$Back_Green$Font_White$Font_B$service$Font_Suffix"
+# break
+# fi
+# done
+# else
+# response=$(timeout 4 bash -c "echo -e 'QUIT\r\n' | nc -s $IP -w4 $host $port 2>&1")
+# if [[ $response == *"$expected_response"* ]];then
+# success="true"
+# smail[$service]="$Back_Green$Font_White$Font_B$service$Font_Suffix"
+# fi
+# fi
+# if [[ $success == "false" ]];then
+# smail[$service]="$Back_Red$Font_White$Font_B$service$Font_Suffix"
+# fi
+# }
+# check_mail(){
+# check_local_port_25 "localhost" 25
+# if [ ${smail[local]} -eq 1 ];then
+# services=("Gmail" "Outlook" "Yahoo" "Apple" "QQ" "MailRU" "AOL" "GMX" "MailCOM" "163" "Sohu" "Sina")
+# for service in "${services[@]}";do
+# local temp_info="$Font_Cyan$Font_B${sinfo[mail]}$Font_I$service $Font_Suffix"
+# ((ibar_step+=3))
+# show_progress_bar "$temp_info" $((40-1-${#service}-${sinfo[lmail]}))&
+# bar_pid="$!"&&disown "$bar_pid"
+# check_email_service $service
+# kill_progress_bar
+# done
+# fi
+# }
 check_dnsbl_parallel(){
 ip_to_check=$1
 parallel_jobs=$2
@@ -1923,20 +1923,20 @@ echo -ne "\r$Font_Cyan${smedia[status]}${tiktok[ustatus]}${disney[ustatus]}${net
 echo -ne "\r$Font_Cyan${smedia[region]}$Font_Green${tiktok[uregion]}${disney[uregion]}${netflix[uregion]}${youtube[uregion]}${amazon[uregion]}${spotify[uregion]}${chatgpt[uregion]}$Font_Suffix\n"
 echo -ne "\r$Font_Cyan${smedia[type]}${tiktok[utype]}${disney[utype]}${netflix[utype]}${youtube[utype]}${amazon[utype]}${spotify[utype]}${chatgpt[utype]}$Font_Suffix\n"
 }
-show_mail(){
-echo -ne "\r${smail[title]}\n"
-if [ ${smail[local]} -eq 1 ];then
-echo -ne "\r$Font_Cyan${smail[port]}$Font_Suffix${smail[yes]}\n"
-echo -ne "\r$Font_Cyan${smail[provider]}$Font_Suffix"
-for service in "${services[@]}";do
-echo -ne "${smail[$service]} "
-done
-echo ""
-else
-echo -ne "\r$Font_Cyan${smail[port]}$Font_Suffix${smail[no]}\n"
-fi
-[[ $1 -eq 4 ]]&&echo -ne "\r${smail[sdnsbl]}\n"
-}
+# show_mail(){
+# echo -ne "\r${smail[title]}\n"
+# if [ ${smail[local]} -eq 1 ];then
+# echo -ne "\r$Font_Cyan${smail[port]}$Font_Suffix${smail[yes]}\n"
+# echo -ne "\r$Font_Cyan${smail[provider]}$Font_Suffix"
+# for service in "${services[@]}";do
+# echo -ne "${smail[$service]} "
+# done
+# echo ""
+# else
+# echo -ne "\r$Font_Cyan${smail[port]}$Font_Suffix${smail[no]}\n"
+# fi
+# [[ $1 -eq 4 ]]&&echo -ne "\r${smail[sdnsbl]}\n"
+# }
 show_tail(){
 echo -ne "\r$(printf '%72s'|tr ' ' '=')\n"
 echo -ne "\r$Font_I${stail[stoday]}${stail[today]}${stail[stotal]}${stail[total]}${stail[thanks]} $Font_Suffix\n"
@@ -2026,12 +2026,12 @@ show_help(){
 echo -ne "\r$shelp\n"
 exit 0
 }
-show_ad(){
-asponsor=$(curl -sL --max-time 5 "https://cdn.jsdelivr.net/gh/xykt/IPQuality@main/ref/sponsor.ans")
-aad1=$(curl -sL --max-time 5 "https://cdn.jsdelivr.net/gh/xykt/IPQuality@main/ref/ad1.ans")
-echo -e "$asponsor"
-echo -e "$aad1"
-}
+# show_ad(){
+# asponsor=$(curl -sL --max-time 5 "https://cdn.jsdelivr.net/gh/xykt/IPQuality@main/ref/sponsor.ans")
+# aad1=$(curl -sL --max-time 5 "https://cdn.jsdelivr.net/gh/xykt/IPQuality@main/ref/ad1.ans")
+# echo -e "$asponsor"
+# echo -e "$aad1"
+# }
 check_IP(){
 IP=$1
 ibar_step=0
@@ -2057,7 +2057,7 @@ MediaUnlockTest_YouTube_Premium $2
 MediaUnlockTest_PrimeVideo_Region $2
 MediaUnlockTest_Spotify $2
 OpenAITest $2
-check_mail
+# check_mail
 [[ $2 -eq 4 ]]&&check_dnsbl "$IP" 50
 echo -ne "$Font_LineClear"
 if [ $2 -eq 4 ]||[[ $IPV4work -eq 0 || $IPV4check -eq 0 ]];then
@@ -2094,8 +2094,8 @@ if [[ $ERRORcode -ne 0 ]];then
   echo -ne "\r$Font_B$Font_Red${swarn[$ERRORcode]}$Font_Suffix\n"
   exit $ERRORcode
 fi
-clear
-show_ad
+# clear
+# show_ad
 # [[ $IPV4work -ne 0 && $IPV4check -ne 0 ]]&&check_IP "$IPV4" 4
 # [[ $IPV6work -ne 0 && $IPV6check -ne 0 ]]&&check_IP "$IPV6" 6
 if [ -n "$IP" ]; then
