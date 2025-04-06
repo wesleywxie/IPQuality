@@ -1943,7 +1943,8 @@ echo -ne "\r$Font_I${stail[stoday]}${stail[today]}${stail[stotal]}${stail[total]
 echo -e ""
 }
 get_opts(){
-while getopts "i:l:x:fhny46" opt;do
+# while getopts "i:l:x:fhny46" opt;do
+while getopts "i:l:x:fhny46p:" opt; do
 case $opt in
 4)if
 [[ IPV4check -ne 0 ]]
