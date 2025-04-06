@@ -2062,18 +2062,35 @@ echo -ne "\r\n"
 }
 generate_random_user_agent
 adapt_locale
-get_ipv4
-get_ipv6
-is_valid_ipv4 $IPV4
-is_valid_ipv6 $IPV6
+# get_ipv4
+# get_ipv6
+# is_valid_ipv4 $IPV4
+# is_valid_ipv6 $IPV6
 get_opts "$@"
 [[ mode_no -eq 0 ]]&&install_dependencies
 set_language
 if [[ $ERRORcode -ne 0 ]];then
-echo -ne "\r$Font_B$Font_Red${swarn[$ERRORcode]}$Font_Suffix\n"
-exit $ERRORcode
+# echo -ne "\r$Font_B$Font_Red${swarn[$ERRORcode]}$Font_Suffix\n"
+# exit $ERRORcode
+  echo -ne "\r$Font_B$Font_Red${swarn[$ERRORcode]}$Font_Suffix\n"
+  exit $ERRORcode
 fi
 clear
 show_ad
-[[ $IPV4work -ne 0 && $IPV4check -ne 0 ]]&&check_IP "$IPV4" 4
-[[ $IPV6work -ne 0 && $IPV6check -ne 0 ]]&&check_IP "$IPV6" 6
+# [[ $IPV4work -ne 0 && $IPV4check -ne 0 ]]&&check_IP "$IPV4" 4
+# [[ $IPV6work -ne 0 && $IPV6check -ne 0 ]]&&check_IP "$IPV6" 6
+if [ -n "$IP" ]; then
+  # If an IP was provided, check its version and run check_IP accordingly
+  is_valid_ipv4 "$IP"
+  if [ $? -eq 0 ]; then
+      check_IP "$IP" 4
+  else
+      is_valid_ipv6 "$IP"
+      if [ $? -eq 0 ]; then
+          check_IP "$IP" 6
+      fi
+  fi
+else
+  [[ $IPV4work -ne 0 && $IPV4check -ne 0 ]]&&check_IP "$IPV4" 4
+  [[ $IPV6work -ne 0 && $IPV6check -ne 0 ]]&&check_IP "$IPV6" 6
+fi
