@@ -75,7 +75,7 @@ declare -A stype
 declare -A sscore
 declare -A sfactor
 declare -A smedia
-declare -A smail
+# declare -A smail
 declare -A stail
 declare mode_no=0
 declare mode_yes=0
@@ -209,20 +209,20 @@ smedia[meida]="Service: "
 smedia[status]="Status:  "
 smedia[region]="Region:  "
 smedia[type]="Type:    "
-smail[title]="6. Email service availability and blacklist detection"
-smail[port]="Local Port 25: "
-smail[yes]="${Font_Green}Available$Font_Suffix"
-smail[no]="${Font_Red}Blocked$Font_Suffix"
-smail[provider]="Conn: "
-smail[dnsbl]="DNSBL database: "
-smail[available]="$Font_Suffix${Font_Cyan}Active $Font_B"
-smail[clean]="$Font_Suffix${Font_Green}Clean $Font_B"
-smail[marked]="$Font_Suffix${Font_Yellow}Marked $Font_B"
-smail[blacklisted]="$Font_Suffix${Font_Red}Blacklisted $Font_B"
-stail[stoday]="IP Checks Today: "
-stail[stotal]="; Total: "
+# smail[title]="6. Email service availability and blacklist detection"
+# smail[port]="Local Port 25: "
+# smail[yes]="${Font_Green}Available$Font_Suffix"
+# smail[no]="${Font_Red}Blocked$Font_Suffix"
+# smail[provider]="Conn: "
+# smail[dnsbl]="DNSBL database: "
+# smail[available]="$Font_Suffix${Font_Cyan}Active $Font_B"
+# smail[clean]="$Font_Suffix${Font_Green}Clean $Font_B"
+# smail[marked]="$Font_Suffix${Font_Yellow}Marked $Font_B"
+# smail[blacklisted]="$Font_Suffix${Font_Red}Blacklisted $Font_B"
+# stail[stoday]="IP Checks Today: "
+# stail[stotal]="; Total: "
 stail[thanks]=". Thanks for running xy scripts!"
-stail[link]="${Font_I}Report Link: $Font_U"
+# stail[link]="${Font_I}Report Link: $Font_U"
 ;;
 "cn")swarn[1]="错误：不支持的参数！"
 swarn[2]="错误：IP地址格式错误！"
@@ -326,28 +326,28 @@ smedia[meida]="服务商： "
 smedia[status]="状态：   "
 smedia[region]="地区：   "
 smedia[type]="方式：   "
-smail[title]="六、邮局连通性及黑名单检测"
-smail[port]="本地25端口："
-smail[yes]="$Font_Green可用$Font_Suffix"
-smail[no]="$Font_Red阻断$Font_Suffix"
-smail[provider]="通信："
-smail[dnsbl]="IP地址黑名单数据库："
-smail[available]="$Font_Suffix$Font_Cyan有效 $Font_B"
-smail[clean]="$Font_Suffix$Font_Green正常 $Font_B"
-smail[marked]="$Font_Suffix$Font_Yellow已标记 $Font_B"
-smail[blacklisted]="$Font_Suffix$Font_Red黑名单 $Font_B"
-stail[stoday]="今日IP检测量："
-stail[stotal]="；总检测量："
+# smail[title]="六、邮局连通性及黑名单检测"
+# smail[port]="本地25端口："
+# smail[yes]="$Font_Green可用$Font_Suffix"
+# smail[no]="$Font_Red阻断$Font_Suffix"
+# smail[provider]="通信："
+# smail[dnsbl]="IP地址黑名单数据库："
+# smail[available]="$Font_Suffix$Font_Cyan有效 $Font_B"
+# smail[clean]="$Font_Suffix$Font_Green正常 $Font_B"
+# smail[marked]="$Font_Suffix$Font_Yellow已标记 $Font_B"
+# smail[blacklisted]="$Font_Suffix$Font_Red黑名单 $Font_B"
+# stail[stoday]="今日IP检测量："
+# stail[stotal]="；总检测量："
 stail[thanks]="。感谢使用xy系列脚本！"
-stail[link]="$Font_I报告链接：$Font_U"
+# stail[link]="$Font_I报告链接：$Font_U"
 ;;
 *)echo -ne "ERROR: Language not supported!"
 esac
 }
-countRunTimes() {
-local RunTimes=$(curl ${CurlARG} -s --max-time 10 "https://hits.xykt.de/ip?action=hit" 2>&1)
-stail[today]=$(echo "${RunTimes}"|jq '.daily')
-stail[total]=$(echo "${RunTimes}"|jq '.total')
+# countRunTimes() {
+# local RunTimes=$(curl ${CurlARG} -s --max-time 10 "https://hits.xykt.de/ip?action=hit" 2>&1)
+# stail[today]=$(echo "${RunTimes}"|jq '.daily')
+# stail[total]=$(echo "${RunTimes}"|jq '.total')
 }
 show_progress_bar(){
 local bar="\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F"
@@ -1653,42 +1653,42 @@ dig +short MX $domain|sort -n|head -1|awk '{print $2}'
 # done
 # fi
 # }
-check_dnsbl_parallel(){
-ip_to_check=$1
-parallel_jobs=$2
-smail[t]=0
-smail[c]=0
-smail[m]=0
-smail[b]=0
-reversed_ip=$(echo "$ip_to_check"|awk -F. '{print $4"."$3"."$2"."$1}')
-local total=0
-local clean=0
-local blacklisted=0
-local other=0
-curl $CurlARG -s "https://raw.githubusercontent.com/xykt/IPQuality/main/ref/dnsbl.list"|sort -u|xargs -P "$parallel_jobs" -I {} bash -c "result=\$(dig +short \"$reversed_ip.{}\" A); if [[ -z \"\$result\" ]]; then echo 'Clean'; elif [[ \"\$result\" == '127.0.0.2' ]]; then echo 'Blacklisted'; else echo 'Other'; fi"|{
-while IFS= read -r line;do
-((total++))
-case "$line" in
-"Clean")((clean++));;
-"Blacklisted")((blacklisted++));;
-*)((other++))
-esac
-done
-smail[t]="$total"
-smail[c]="$clean"
-smail[m]="$other"
-smail[b]="$blacklisted"
-echo "$Font_Cyan${smail[dnsbl]}  ${smail[available]}${smail[t]}   ${smail[clean]}${smail[c]}   ${smail[marked]}${smail[m]}   ${smail[blacklisted]}${smail[b]}$Font_Suffix"
-}
-}
-check_dnsbl(){
-local temp_info="$Font_Cyan$Font_B${sinfo[dnsbl]} $Font_Suffix"
-((ibar_step=95))
-show_progress_bar "$temp_info" $((40-1-${sinfo[ldnsbl]}))&
-bar_pid="$!"&&disown "$bar_pid"
-trap "kill_progress_bar" RETURN
-smail[sdnsbl]=$(check_dnsbl_parallel "$IP" 50)
-}
+# check_dnsbl_parallel(){
+# ip_to_check=$1
+# parallel_jobs=$2
+# smail[t]=0
+# smail[c]=0
+# smail[m]=0
+# smail[b]=0
+# reversed_ip=$(echo "$ip_to_check"|awk -F. '{print $4"."$3"."$2"."$1}')
+# local total=0
+# local clean=0
+# local blacklisted=0
+# local other=0
+# curl $CurlARG -s "https://raw.githubusercontent.com/xykt/IPQuality/main/ref/dnsbl.list"|sort -u|xargs -P "$parallel_jobs" -I {} bash -c "result=\$(dig +short \"$reversed_ip.{}\" A); if [[ -z \"\$result\" ]]; then echo 'Clean'; elif [[ \"\$result\" == '127.0.0.2' ]]; then echo 'Blacklisted'; else echo 'Other'; fi"|{
+# while IFS= read -r line;do
+# ((total++))
+# case "$line" in
+# "Clean")((clean++));;
+# "Blacklisted")((blacklisted++));;
+# *)((other++))
+# esac
+# done
+# smail[t]="$total"
+# smail[c]="$clean"
+# smail[m]="$other"
+# smail[b]="$blacklisted"
+# echo "$Font_Cyan${smail[dnsbl]}  ${smail[available]}${smail[t]}   ${smail[clean]}${smail[c]}   ${smail[marked]}${smail[m]}   ${smail[blacklisted]}${smail[b]}$Font_Suffix"
+# }
+# }
+# check_dnsbl(){
+# local temp_info="$Font_Cyan$Font_B${sinfo[dnsbl]} $Font_Suffix"
+# ((ibar_step=95))
+# show_progress_bar "$temp_info" $((40-1-${sinfo[ldnsbl]}))&
+# bar_pid="$!"&&disown "$bar_pid"
+# trap "kill_progress_bar" RETURN
+# smail[sdnsbl]=$(check_dnsbl_parallel "$IP" 50)
+# }
 show_head(){
 echo -ne "\r$(printf '%72s'|tr ' ' '#')\n"
 if [ $fullIP -eq 1 ];then
@@ -1939,7 +1939,8 @@ echo -ne "\r$Font_Cyan${smedia[type]}${tiktok[utype]}${disney[utype]}${netflix[u
 # }
 show_tail(){
 echo -ne "\r$(printf '%72s'|tr ' ' '=')\n"
-echo -ne "\r$Font_I${stail[stoday]}${stail[today]}${stail[stotal]}${stail[total]}${stail[thanks]} $Font_Suffix\n"
+echo -ne "\r$Font_I${stail[thanks]} $Font_Suffix\n"
+# echo -ne "\r$Font_I${stail[stoday]}${stail[today]}${stail[stotal]}${stail[total]}${stail[thanks]} $Font_Suffix\n"
 echo -e ""
 }
 get_opts(){
@@ -2037,7 +2038,7 @@ IP=$1
 ibar_step=0
 [[ $2 -eq 4 ]]&&hide_ipv4 $IP
 [[ $2 -eq 6 ]]&&hide_ipv6 $IP
-countRunTimes
+# countRunTimes
 db_maxmind $2
 db_ipinfo
 db_scamalytics
@@ -2058,7 +2059,7 @@ MediaUnlockTest_PrimeVideo_Region $2
 MediaUnlockTest_Spotify $2
 OpenAITest $2
 # check_mail
-[[ $2 -eq 4 ]]&&check_dnsbl "$IP" 50
+# [[ $2 -eq 4 ]]&&check_dnsbl "$IP" 50
 echo -ne "$Font_LineClear"
 if [ $2 -eq 4 ]||[[ $IPV4work -eq 0 || $IPV4check -eq 0 ]];then
 for ((i=0; i<ADLines; i++));do
@@ -2073,7 +2074,8 @@ show_score
 show_factor
 show_media
 # show_mail $2
-show_tail)
+show_tail
+)
 echo -ne "\r$ip_report\n"
 echo -ne "\r\n"
 # local report_link=$(curl -$2 -s -X POST http://upload.check.place -d "type=ip" --data-urlencode "content=$ip_report")
